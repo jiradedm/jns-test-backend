@@ -1,0 +1,29 @@
+{
+  "ts-node": {
+    "files": true,
+    "swc": true,
+    "require": [
+      "tsconfig-paths/register"
+    ]
+  },
+  "compilerOptions": {
+    "strict": true,
+    "skipLibCheck": true,
+    "esModuleInterop": true,
+    "emitDecoratorMetadata": true,
+    "experimentalDecorators": true,
+    "paths": {
+      "@/*": [
+        "./src/*"
+      ]
+    },
+    "outDir": "./dist",
+  },
+  "include": [
+    "**/*.ts",
+    "**/*.d.ts",
+  ],
+  "exclude": [
+    "node_modules"
+  ]
+}
