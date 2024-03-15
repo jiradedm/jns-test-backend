@@ -9,7 +9,10 @@ app.get("/:placeName", async (req, res, next) => {
   try {
     const resp = await axios.post(
       "https://places.googleapis.com/v1/places:searchText",
-      { textQuery: placeName },
+      {
+        textQuery: placeName,
+        includedType: "restaurant",
+      },
       {
         headers: {
           "Content-Type": "application/json",
@@ -26,8 +29,7 @@ app.get("/:placeName", async (req, res, next) => {
 });
 
 const run = () => {
-  app.listen(3000);
-  // eslint-disable-next-line no-console
+  app.listen(3001);
   console.log("🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀");
 };
 
