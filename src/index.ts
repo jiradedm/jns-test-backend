@@ -55,11 +55,27 @@ app.get("/game24/:number", async (req, res, next) => {
   }
 });
 
-app.get("/:placeName", async (req, res, next) => {
+interface Place {
+  displayName: {
+    text: string;
+    languageCode: string;
+  };
+  formattedAddress: string;
+  // photos: {
+  //   name: string;
+  //   widthPx: number;
+  //   heightPx: number;
+  // }[];
+  // photo: string;
+}
+
+app.get("/place/:placeName", async (req, res, next) => {
   const { placeName } = req.params;
 
+  const API_KEY = "AIzaSyClulrZcf-CYhUdzT_dWwpzCJDoOUSmCmg";
+
   try {
-    const resp = await axios.post(
+    const resp = await axios.post<{ places: Place[] }>(
       "https://places.googleapis.com/v1/places:searchText",
       {
         textQuery: placeName,
@@ -68,13 +84,15 @@ app.get("/:placeName", async (req, res, next) => {
       {
         headers: {
           "Content-Type": "application/json",
-          "X-Goog-Api-Key": "AIzaSyClulrZcf-CYhUdzT_dWwpzCJDoOUSmCmg",
-          "X-Goog-FieldMask": "places.displayName,places.formattedAddress",
+          "X-Goog-Api-Key": API_KEY,
+          "X-Goog-FieldMask": "places.displayName,places.formattedAddress,places.photos",
         },
       },
     );
 
-    return res.send(resp.data);
+    const places = resp.data.places || [];
+
+    return res.send(places);
   } catch (err) {
     return next(err);
   }
