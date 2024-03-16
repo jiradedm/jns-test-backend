@@ -1,7 +1,10 @@
 import axios from "axios";
+import cors from "cors";
 import express from "express";
 
 const app = express();
+app.use(cors());
+app.use(express.json());
 
 app.get("/game24/:number", async (req, res, next) => {
   try {
@@ -75,6 +78,74 @@ app.get("/:placeName", async (req, res, next) => {
   } catch (err) {
     return next(err);
   }
+});
+
+interface Board {
+  index: number;
+  value: "Player" | "Bot" | "";
+}
+
+app.post("/xo", async (req, res, next) => {
+  const board = req.body.board as Board[];
+
+  try {
+    const winConditions = [
+      [0, 1, 2],
+      [3, 4, 5],
+      [6, 7, 8],
+      [0, 3, 6],
+      [1, 4, 7],
+      [2, 5, 8],
+      [0, 4, 8],
+      [2, 4, 6],
+    ];
+
+    if (!board.find((item) => item.value === "")) return res.json(board);
+
+    const random = (max: number) => Math.floor(Math.random() * (max - 0.01));
+
+    const nextMove = () => {
+      const winingFlag = winConditions.map((winCondition) => {
+        const indexes = winCondition.map((a) => board[a].value || a);
+        const playerFlag = indexes.filter((y) => y === "Player").length === 2;
+        const botFlag = indexes.filter((y) => y === "Bot").length === 2;
+        return { indexes, playerFlag, botFlag };
+      });
+
+      // Bot about to win
+      const botWinFlagged = winingFlag.filter(
+        (item) => item.botFlag && item.indexes.some((index) => Number.isFinite(index)),
+      );
+      if (botWinFlagged.length !== 0) {
+        const index = random(botWinFlagged.length);
+        return botWinFlagged[index].indexes.find((item) => Number.isFinite(item)) as number;
+      }
+
+      // Player about to win
+      const playerWinFlagged = winingFlag.filter(
+        (item) => item.playerFlag && item.indexes.some((index) => Number.isFinite(index)),
+      );
+      if (playerWinFlagged.length !== 0) {
+        const index = random(playerWinFlagged.length);
+        return playerWinFlagged[index].indexes.find((yy) => Number.isFinite(yy)) as number;
+      }
+
+      // None about to win
+      const availableMove = board.filter((item) => item.value === "");
+      const index = Math.floor(Math.random() * (availableMove.length - 0.01));
+      return availableMove[index].index;
+    };
+
+    const index = nextMove();
+    board[index] = { ...board[index], value: "Bot" } as Board;
+    return res.send(board);
+  } catch (err) {
+    return next(err);
+  }
+});
+
+app.get("/", async (_, res) => {
+  return res.send("API");
 });
 
 const run = () => {
