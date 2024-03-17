@@ -8,5 +8,5 @@ nodemon --exec ts-node src/index.ts
 
 ## deploy
 
-https://jnz-test-backend.vercel.app
+https://jns-test-backend.vercel.app
 
