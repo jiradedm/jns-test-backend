@@ -61,12 +61,12 @@ interface Place {
     languageCode: string;
   };
   formattedAddress: string;
-  // photos: {
-  //   name: string;
-  //   widthPx: number;
-  //   heightPx: number;
-  // }[];
-  // photo: string;
+  photos: {
+    name: string;
+    widthPx: number;
+    heightPx: number;
+  }[];
+  photo: string;
 }
 
 app.get("/place/:placeName", async (req, res, next) => {
@@ -90,7 +90,18 @@ app.get("/place/:placeName", async (req, res, next) => {
       },
     );
 
-    const places = resp.data.places || [];
+    const places = await Promise.all(
+      (resp.data.places || []).map(async (place) => {
+        const photo = place.photos?.[0];
+        if (!photo) return place;
+
+        const photoRes = await axios.get(
+          `https://places.googleapis.com/v1/${photo.name}/media?key=${API_KEY}&maxHeightPx=${photo.heightPx}&maxWidthPx=${photo.widthPx}&skipHttpRedirect=true`,
+        );
+
+        return { ...place, photo: photoRes.data.photoUri };
+      }),
+    );
 
     return res.send(places);
   } catch (err) {
