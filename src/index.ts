@@ -166,10 +166,8 @@ app.get("/", async (_, res) => {
   return res.send("API");
 });
 
-const run = () => {
-  const port = process.env.PORT || 3001;
-  app.listen(port);
-  console.log(`🚀🚀🚀 running on ${port} 🚀🚀🚀`);
-};
+const port = process.env.PORT || 3001;
+app.listen(port);
+console.log(`🚀🚀🚀 running on ${port} 🚀🚀🚀`);
 
-run();
+export default app;
