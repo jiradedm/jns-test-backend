@@ -167,8 +167,9 @@ app.get("/", async (_, res) => {
 });
 
 const run = () => {
-  app.listen(3001);
-  console.log("🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀");
+  const port = process.env.PORT || 3001;
+  app.listen(port);
+  console.log(`🚀🚀🚀 running on ${port} 🚀🚀🚀`);
 };
 
 run();
